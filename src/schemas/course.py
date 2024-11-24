@@ -42,3 +42,6 @@ class PaginatedCourseQuery(BaseModel):
 class GPTResponse(BaseModel):
     course: str
     topics: list
+
+class GenerateRoadMapQuery(BaseModel):
+    query : str

@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException,status,Query,File, UploadFile, HTTPException
-from src.schemas.course import CourseBase,CreateCourseRequest,PaginatedCourseQuery
+from src.schemas.course import CourseBase,CreateCourseRequest,PaginatedCourseQuery,GenerateRoadMapQuery
 from src.services import course
 from typing import Any,Annotated
+import json
+from fastapi.responses import JSONResponse
 router = APIRouter()
 
 
@@ -22,4 +24,19 @@ async def process_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
     return course.create_kg_from_pdf(file)
+
+@router.get("/generate-roadmap")
+def generate_roadmap_endpoint(roadmap: Annotated[GenerateRoadMapQuery, Query()]):
+    """
+    API endpoint to generate a learning roadmap.
+    Expects a `query` string in the JSON body of the request.
+    """
+    data = roadmap
+    query = data.query
+
+    try:
+        roadmap = course.generate_road_maps(query)
+        return JSONResponse(content={"roadmap": roadmap}, status_code=200)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
     
