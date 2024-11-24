@@ -1,7 +1,7 @@
 from pydantic import BaseModel,Field
 from typing import List, Optional
 from constants.enums import SortOrder
-from fastapi import FastAPI, APIRouter, Query, status
+
 # Define the request and response schemas
 class CourseBase(BaseModel):
     id: str
@@ -38,3 +38,7 @@ class PaginatedCourseQuery(BaseModel):
     limit: int = Field(100, gt=0, le=100)
     offset: int = Field(0, ge=0)   # Default value is 10, ensuring limit is >= 1
     sortOrder: SortOrder = SortOrder.ASC
+
+class GPTResponse(BaseModel):
+    course: str
+    topics: list
