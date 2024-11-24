@@ -4,9 +4,14 @@ from src.schemas.course import CreateCourseRequest,AddModuleRequest,AddQuizReque
 from src.utils.helper import created_at, updated_at,extract_text_from_pdf, query_gpt,general_backbone
 from src.utils.prompts import prompt_for_kg
 from typing import Any
+from dotenv import load_dotenv
 import uuid
 import json
-
+import os
+from langchain_openai import ChatOpenAI
+load_dotenv()
+# API Key for OpenAI
+api_key = os.getenv("OPENAI_API_KEY")
 # cypher = initialize_neo4j_connection()
 
 
@@ -69,6 +74,44 @@ def create_kg_from_pdf(file: UploadFile):
     except Exception as e:
         #create_kg_from_pdf(file)
         raise HTTPException(status_code=500, detail="Invalid JSON response from GPT-3.5.")
+    
+def generate_road_maps(query: str) -> dict:
+    """
+    Generates a roadmap based on the query using OpenAI.
+    Returns the roadmap as a Python dictionary.
+    """
+    # Initialize the ChatOpenAI model
+    llm = ChatOpenAI(model="gpt-4", api_key=api_key)
+
+    # Updated Prompt
+    prompt = f"""
+    You are an expert in creating structured, step-by-step learning roadmaps to help individuals achieve mastery in specific topics.
+    Generate a JSON representation of a **directed learning roadmap** based on the user's query. Ensure the relationships clearly show the order of learning.
+
+    The output should include:
+    - `entity1`: The main concept or higher-level topic.
+    - `entity2`: The subtopic or concept that depends on `entity1`.
+    - `relationship`: Describe the connection (e.g., "prerequisite for", "includes", "builds upon").
+    - `priority`: A number indicating the order in which the concepts should be learned, where lower numbers are learned first. No two nodes should have the same priority, and the graph should reflect a clear progression.
+
+    ### Query:
+    {query}
+    """
+
+    # Generate response from OpenAI
+    try:
+        response = llm.invoke(prompt)
+    except Exception as e:
+        raise Exception(f"Error interacting with OpenAI: {str(e)}")
+
+    # Parse and clean the JSON response
+    try:
+        cleaned_response = response.content.strip('```json').strip('```').strip()
+        roadmap = json.loads(cleaned_response)
+    except Exception as e:
+        raise Exception(f"Error parsing OpenAI response: {str(e)}, {cleaned_response}")
+
+    return roadmap
 
 
 
