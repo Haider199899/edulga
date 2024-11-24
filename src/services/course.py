@@ -81,35 +81,47 @@ def generate_road_maps(query: str) -> dict:
     Returns the roadmap as a Python dictionary.
     """
     # Initialize the ChatOpenAI model
-    llm = ChatOpenAI(model="gpt-4", api_key=api_key)
+    #llm = ChatOpenAI(model="gpt-4", api_key=api_key)
 
     # Updated Prompt
     prompt = f"""
     You are an expert in creating structured, step-by-step learning roadmaps to help individuals achieve mastery in specific topics.
-    Generate a JSON representation of a **directed learning roadmap** based on the user's query. Ensure the relationships clearly show the order of learning.
+    Please always generate a response in JSON of a **directed learning roadmap** based on the user's query. Ensure the relationships clearly show the order of learning.
 
     The output should include:
-    - `entity1`: The main concept or higher-level topic.
-    - `entity2`: The subtopic or concept that depends on `entity1`.
-    - `relationship`: Describe the connection (e.g., "prerequisite for", "includes", "builds upon").
-    - `priority`: A number indicating the order in which the concepts should be learned, where lower numbers are learned first. No two nodes should have the same priority, and the graph should reflect a clear progression.
+    - entity1: The main concept or higher-level topic.
+    - entity2: The subtopic or concept that depends on `entity1`.
+    - relationship: Describe the connection (e.g., "prerequisite for", "includes", "builds upon").
+    - priority: A number indicating the order in which the concepts should be learned, where lower numbers are learned first. No two nodes should have the same priority, and the graph should reflect a clear progression.
 
+    Response should be in that JSON format.
+    
     ### Query:
     {query}
     """
 
     # Generate response from OpenAI
     try:
-        response = llm.invoke(prompt)
+        response = query_gpt(prompt)
     except Exception as e:
         raise Exception(f"Error interacting with OpenAI: {str(e)}")
 
     # Parse and clean the JSON response
     try:
-        cleaned_response = response.content.strip('```json').strip('```').strip()
-        roadmap = json.loads(cleaned_response)
-    except Exception as e:
-        raise Exception(f"Error parsing OpenAI response: {str(e)}, {cleaned_response}")
+        # # Clean the response to remove markdown and ensure valid JSON
+        # cleaned_response = response.strip('```json').strip('```').strip()
+
+        # # Ensure the response is not empty
+        # if not cleaned_response:
+        #     raise ValueError("Received empty response after cleaning.")
+
+        # Parse the cleaned JSON response
+        roadmap = eval(response)
+
+    except json.JSONDecodeError as e:
+        raise Exception(f"Error parsing OpenAI response: {str(e)}, response: {response}")
+    except ValueError as e:
+        raise Exception(f"Received empty or invalid response: {str(e)}")
 
     return roadmap
 
