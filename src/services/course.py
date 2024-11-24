@@ -5,6 +5,7 @@ from utils.helper import created_at, updated_at,extract_text_from_pdf, query_gpt
 from utils.prompts import prompt_for_kg
 from typing import Any
 import uuid
+import json
 
 # cypher = initialize_neo4j_connection()
 
@@ -63,7 +64,7 @@ def create_kg_from_pdf(file: UploadFile):
 
     # Convert GPT response to JSON
     try:
-        response_json = eval(gpt_response)  # Assuming GPT returns a valid Python dict
+        response_json = json.loads(gpt_response)  # Assuming GPT returns a valid Python dict
         return response_json
     except Exception as e:
         #create_kg_from_pdf(file)
