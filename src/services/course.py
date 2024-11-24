@@ -1,8 +1,8 @@
-from config import initialize_neo4j_connection
+from src.config import initialize_neo4j_connection
 from fastapi import APIRouter, HTTPException, status,UploadFile
-from schemas.course import CreateCourseRequest,AddModuleRequest,AddQuizRequest,PaginatedCourseQuery,CourseBase
-from utils.helper import created_at, updated_at,extract_text_from_pdf, query_gpt,general_backbone
-from utils.prompts import prompt_for_kg
+from src.schemas.course import CreateCourseRequest,AddModuleRequest,AddQuizRequest,PaginatedCourseQuery,CourseBase
+from src.utils.helper import created_at, updated_at,extract_text_from_pdf, query_gpt,general_backbone
+from src.utils.prompts import prompt_for_kg
 from typing import Any
 import uuid
 import json

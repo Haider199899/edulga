@@ -1,6 +1,6 @@
 from pydantic import BaseModel,Field
 from typing import List, Optional
-from constants.enums import SortOrder
+from src.constants.enums import SortOrder
 
 # Define the request and response schemas
 class CourseBase(BaseModel):

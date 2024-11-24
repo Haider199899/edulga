@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException,status,Query,File, UploadFile, HTTPException
-from schemas.course import CourseBase,CreateCourseRequest,PaginatedCourseQuery
-from services import course
+from src.schemas.course import CourseBase,CreateCourseRequest,PaginatedCourseQuery
+from src.services import course
 from typing import Any,Annotated
 router = APIRouter()
 

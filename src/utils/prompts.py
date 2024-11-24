@@ -1,4 +1,4 @@
-from utils.helper import general_backbone
+from src.utils.helper import general_backbone
 def prompt_for_kg(pdf_text):
       return (
     f"Based on the following text, create a nested JSON structure. "
