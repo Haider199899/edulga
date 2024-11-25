@@ -29,13 +29,13 @@ def extract_text_from_pdf(pdf_file):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error extracting text: {str(e)}")
 
-def query_gpt(prompt: str):
+def query_gpt(prompt: str,model : str):
     """
     Query GPT-3.5 Turbo with a given prompt.
     """
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=model,
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content.strip()

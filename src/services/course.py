@@ -65,7 +65,7 @@ def create_kg_from_pdf(file: UploadFile):
     prompt = prompt_for_kg(pdf_text)
   
     # Query GPT-3.5 Turbo
-    gpt_response = query_gpt(prompt)
+    gpt_response = query_gpt(prompt,"gpt-3.5-turbo")
 
     # Convert GPT response to JSON
     try:
@@ -84,25 +84,24 @@ def generate_road_maps(query: str) -> dict:
     #llm = ChatOpenAI(model="gpt-4", api_key=api_key)
 
     # Updated Prompt
+    # Updated Prompt
     prompt = f"""
     You are an expert in creating structured, step-by-step learning roadmaps to help individuals achieve mastery in specific topics.
-    Please always generate a response in JSON of a **directed learning roadmap** based on the user's query. Ensure the relationships clearly show the order of learning.
+    Generate a JSON representation of a **directed learning roadmap** based on the user's query. Ensure the relationships clearly show the order of learning.
 
     The output should include:
-    - entity1: The main concept or higher-level topic.
-    - entity2: The subtopic or concept that depends on `entity1`.
-    - relationship: Describe the connection (e.g., "prerequisite for", "includes", "builds upon").
-    - priority: A number indicating the order in which the concepts should be learned, where lower numbers are learned first. No two nodes should have the same priority, and the graph should reflect a clear progression.
+    - `entity1`: The main concept or higher-level topic.
+    - `entity2`: The subtopic or concept that depends on `entity1`.
+    - `relationship`: Describe the connection (e.g., "prerequisite for", "includes", "builds upon").
+    - `priority`: A number indicating the order in which the concepts should be learned, where lower numbers are learned first. No two nodes should have the same priority, and the graph should reflect a clear progression.
 
-    Response should be in that JSON format.
-    
     ### Query:
     {query}
     """
 
     # Generate response from OpenAI
     try:
-        response = query_gpt(prompt)
+        response = query_gpt(prompt,"gpt-4o")
     except Exception as e:
         raise Exception(f"Error interacting with OpenAI: {str(e)}")
 
@@ -116,7 +115,8 @@ def generate_road_maps(query: str) -> dict:
         #     raise ValueError("Received empty response after cleaning.")
 
         # Parse the cleaned JSON response
-        roadmap = eval(response)
+        cleaned_response = response.strip('```json').strip('```').strip()
+        roadmap = json.loads(cleaned_response)
 
     except json.JSONDecodeError as e:
         raise Exception(f"Error parsing OpenAI response: {str(e)}, response: {response}")
